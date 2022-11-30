@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Cadastros</title>
+        <title>Ferramenta de Gestão da Equipe de Sustentação</title>
+        <meta charset="utf-8">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css"/>
         <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.js"  ></script>
         <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
@@ -9,7 +10,8 @@
         const DIAS_MES = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]; 
         const SEMANA   = [ "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado" ];  
         const MESES    = [ "Janeiro", "Fevereiro", "Março"   , "Abril" , "Maio"    , "Junho", 
-                           "Julho"  , "Agosto"   , "Setembro", "Outubro", "Novembro", "Dezembro" ];      
+                           "Julho"  , "Agosto"   , "Setembro", "Outubro", "Novembro", "Dezembro" ]; 
+        
         function eh_bissexto(ano) {
              if ( ano % 4 == 0 && ano % 100 != 0 ) {
                      return true;
@@ -19,61 +21,53 @@
         }
         // Avança o calendário até o primeiro dia diferente de sábado e domingo
         function getPrimeiroDiaUtil(mes, ano) {
-             const semana = [ "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"]
-             dia = 1;
-             data = new Date(ano, mes - 1, dia);
-             diaSemana = data.getDay();
-             while( semana[diaSemana] == "Domingo" || semana[diaSemana] == "Sábado" ) {
-               dia++;
-               data = new Date(ano, mes - 1, dia);
-               diaSemana = data.getDay();
-             }
-             // acrescenta o dia da semana à data
-             dia = data.getDate();
-             dia = dia < 10 ? "0" + dia : dia;     
-             return dia = dia + "/" + mes + "/" + ano + " - " + semana[data.getDay()];
+             
+            let dia = 1;
+            let data = new Date(ano, mes - 1, dia);
+            let diaSemana = data.getDay();
+            while( SEMANA[diaSemana] == "Domingo" || SEMANA[diaSemana] == "Sábado" ) {
+              dia++;
+              data = new Date(ano, mes - 1, dia);
+              diaSemana = data.getDay();
+            }
+            // acrescenta o dia da semana à data
+            //dia = data.getDate();
+            dia = dia < 10 ? "0" + dia : dia;     
+            return dia = dia + "/" + mes + "/" + ano + " - " + SEMANA[data.getDay()];
         }
         // Retrocede o calendário até o último dia diferente de sábado e domingo        
         function getUltimooDiaUtil(mes, ano) {
-            const semana = [ "Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-            const meses =  [ "Janeiro", "Fevereiro", "Março"   , "Abril" , "Maio"    , "Junho", 
-                             "Julho"  , "Agosto"   , "Setembro", "Outubro", "Novembro", "Dezembro" ];
-            const dias_mes = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]; 
-        
+            
             if ( mes == "02" ) {
                 if ( eh_bissexto(ano) )
-                   dias_mes[1] = 29;
+                   DIAS_MES[1] = 29;
             }
             //alert("números de dias: " + dias_mes[1]);
-            dia = dias_mes[mes - 1];
-            data = new Date(ano, mes - 1, dia);
-            diaSemana = data.getDay();
+            let dia = DIAS_MES[mes - 1];
+            let data = new Date(ano, mes - 1, dia);
+            let diaSemana = data.getDay();
         
-             while( semana[diaSemana] == "Domingo" || semana[diaSemana] == "Sábado" ) {
+             while( SEMANA[diaSemana] == "Domingo" || SEMANA[diaSemana] == "Sábado" ) {
                 dia--;
                 data = new Date(ano, mes - 1, dia);
                 diaSemana = data.getDay();
             }
             // acrescenta o dia da semana à data
-            dia = data.getDate();
             dia = dia < 10 ? "0" + dia : dia;     
-            return dia = dia + "/" + mes + "/" + ano + " - " + semana[data.getDay()]; 
+            return dia = dia + "/" + mes + "/" + ano + " - " + SEMANA[data.getDay()]; 
         }
         // Avança do primeiro ao último dia do mês acumulando quando o dia for diferente de sábado/domingo
         function getDiasUteis(mes, ano) {
             let numDias = 0;
-            //alert("números de dias do mês " + MESES[Number(mes)-1] + " é de " + DIAS_MES[Number(mes) - 1]);
-            //document.write("mes = " + mes + ", ano = " + ano + "<br/><br/>");
-            const DIAS_MES = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ]; 
+            
             if ( mes == "02" ) {
                 if ( eh_bissexto(ano) )
                    DIAS_MES[1] = 29;
             }
-            //alert(DIAS_MES[Number(mes)-1]);
-            //alert("fim do for = " + DIAS_MES[mes]);
-            for ( var dia = 1; dia <= DIAS_MES[Number(mes)]-1; dia++ ) {
+            let fim_loop = DIAS_MES[mes -1];
+            for ( let dia = 1; dia <= fim_loop; dia++ ) {
                 let data = new Date(ano, mes - 1, dia);
-                if ( SEMANA[data.getDay()] != "Domingo" && SEMANA[data.getDay()] != "Sábado" ) {
+                if ( ( SEMANA[data.getDay()] != "Domingo" ) && ( SEMANA[data.getDay()] != "Sábado" ) ) {
                     numDias++;
                 }
                 //document.writeln(dia + "/" + mes + "/" + ano + " - dia útil " + numDias + "<br/>");
@@ -111,20 +105,17 @@
 
         // Só executa essa parte quando toda a html estiver renderizada
         $(document).ready(function(){
-        
-            //ano = document.getElementById("ano");
-            //mes = document.getElemebtById("mes")
-    
+            
             // Associa os componentes da tela a variáveis
             let diasUteis = document.getElementById("dias_uteis");
             let primeiroDiaUtil = document.getElementById("primeiro_dia_util");
             let ultimooDiaUtil = document.getElementById("ultimo_dia_util");
             let combo = document.getElementById("mes");
-            //combo.setAttribute("value", Number(new Date().getMonth()) + 1);
 
             // Associa o botão descobrir aos comandos a serem executados
             $("#descobrir").click(function() {
                 let mes = document.getElementById("mes").value;
+                //alert("mes selecionado " + mes);
                 let ano = document.getElementById("ano").value;
                 primeiroDiaUtil.value = getPrimeiroDiaUtil(mes, ano);
                 ultimooDiaUtil.value = getUltimooDiaUtil(mes,ano);
@@ -139,7 +130,7 @@
     <body>
     <main>    
     <div id="accordion">
-        <h3>Descobre Dias Úteis</h3>
+        <h3>Recupera informações para o serviço de sustentação</h3>
         <div>
         <form id="form" method="get" action="">
             <fieldset>
@@ -190,7 +181,7 @@
             
         </form>
         </div>
-        <h3>Ajusta PF</h3>
+        <h3>Ajusta Pontos de Função</h3>
         <div>
             <fieldset>
                 <legend>Sistema / dias a faturar</legend>
@@ -245,7 +236,7 @@
                 <input type="text" id="resultado" readonly>
             </fieldset>
         </div>
-        <h3>Número por extenso</h3>
+        <h3>Números por extenso</h3>
         <div>
             <fieldset>
                 <legend>número inteiro</legend>
